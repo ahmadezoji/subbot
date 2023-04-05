@@ -1,0 +1,5 @@
+key = iTV2lq2325eSpTHO
+
+
+curl https://api.coinbase.com/v2/prices/BTC-USD/buy \
+  -H 'Authorization: Bearer abd90df5f27a7b170cd775abf89d632b350b7c1c9d53e08b340cd9832ce52c2c'
