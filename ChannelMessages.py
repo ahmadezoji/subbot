@@ -39,7 +39,7 @@ username = config['Telegram']['username']
 
 # Create the client and connect
 client = TelegramClient(username, api_id, api_hash)
-_offset_id=0
+offset_id = 0
 
 async def main():
     await client.start()
@@ -64,7 +64,7 @@ async def main():
 
     my_channel = await client.get_entity(entity)
 
-    offset_id = _offset_id
+    offset_id = 0
     limit = 10
     all_messages = []
     total_messages = 0
@@ -85,11 +85,11 @@ async def main():
         # if not history.messages:
         #     break
         messages = history.messages
-        print(messages[0].message)
+
         for msg in messages:
             if "buy setup" in msg.message.lower():
                 print(msg.message)
-        # _offset_id =
+        _offset_id = messages[0]
         time.sleep(10)
 
         # for message in messages:
