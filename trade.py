@@ -65,6 +65,8 @@ def setupOrder(type, symbol):
         result = placeOrder(symbol, "Bid", last_price, vol, "Market", "Open", takerProfitPrice, stopLossPrice)
     print(result)
 def placeOrder(symbol, side, price, volume, tradeType, action,tf,sl):
+    print(f'TF ={tf}')
+    print(f'SL ={sl}')
     paramsMap = {
         "symbol": symbol,
         "apiKey": API_KEY,
