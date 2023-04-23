@@ -6,13 +6,16 @@ import time
 
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
-from telethon.tl.functions.messages import (GetHistoryRequest)
+from telethon.tl.functions.messages import (GetHistoryRequest, GetUnreadMentionsRequest)
 from telethon.tl.types import (
     PeerChannel
 )
 
 
 # some functions to parse json date
+from trade import *
+
+
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, datetime):
@@ -39,7 +42,7 @@ username = config['Telegram']['username']
 
 # Create the client and connect
 client = TelegramClient(username, api_id, api_hash)
-offset_id = 0
+
 
 async def main():
     await client.start()
@@ -54,7 +57,7 @@ async def main():
 
     me = await client.get_me()
 
-    user_input_channel = 'https://t.me/rosecryptochannelpremium'
+    user_input_channel = 'https://t.me/rosecryptochannelpremium'  # 'https://t.me/iraninanfreedom'#'https://t.me/withIranfromIstanbul'#'https://t.me/IranintlTV' #https://t.me/ManotoTV'
     # input('enter entity(telegram URL or entity id):')
 
     if user_input_channel.isdigit():
@@ -65,16 +68,16 @@ async def main():
     my_channel = await client.get_entity(entity)
 
     offset_id = 0
-    limit = 10
+    limit = 25
     all_messages = []
+    submit_orders_id = []
     total_messages = 0
     total_count_limit = 0
 
     while True:
-        # print("Current Offset ID is:", offset_id, "; Total Messages:", total_messages)
         history = await client(GetHistoryRequest(
             peer=my_channel,
-            offset_id=offset_id,
+            offset_id=0,
             offset_date=None,
             add_offset=0,
             limit=limit,
@@ -82,29 +85,47 @@ async def main():
             min_id=0,
             hash=0
         ))
-        # if not history.messages:
-        #     break
         messages = history.messages
+        if len(messages) > 0:
+            type = "long"
 
-        for msg in messages:
-            if "buy setup" in msg.message.lower():
-                print(msg.message)
-        _offset_id = messages[0]
-        time.sleep(10)
+            for msg in messages:
+                symbol = " "
+                if "buy setup" in msg.message.lower():
+                    type = "long"
+                    symbol = findSymbol(msg.message)
+                    print(f'long symbol ={symbol}\n')
+                elif "short setup" in msg.message.lower():
+                    type = "short"
+                    symbol = findSymbol(msg.message)
+                    print(f'short symbol= {symbol}\n')
+                offset_id = messages[0].id
 
-        # for message in messages:
-        #     all_messages.append(message.to_dict())
-        # offset_id = messages[len(messages) - 1].id
-        # total_messages = len(all_messages)
-        # if total_count_limit != 0 and total_messages >= total_count_limit:
-        #     break
-    # print(messages[len(messages) - 1])
+                amount = 10.0 #USDT
+                last_price = getLatestPrice(symbol)
+                # vol = amount /  last_price
+                # if type == "short" :
+                #     takerProfitPrice = last_price - (last_price * 0.02)
+                #     stopLossPrice = last_price + (last_price * 0.05)
+                #     result = placeOrder(symbol, "Ask", last_price , vol, "Market", "Open",takerProfitPrice,stopLossPrice)
+                # else:
+                #     takerProfitPrice = last_price + (last_price * 0.05)
+                #     stopLossPrice = last_price - (last_price * 0.02)
+                #     result = placeOrder(symbol, "Bid", last_price, vol, "Market", "Open", takerProfitPrice, stopLossPrice)
+                # print(result)
 
-    # with open('channel_messages.json', 'w') as outfile:
-    #     json.dump(all_messages, outfile, cls=DateTimeEncoder)
-# def parsMessage(message):
-#     if("entry" in message):
+
+                # my_json = json.loads(result.decode('utf8').replace("'", '"'))
+                # orderid = my_json['data']['orderId']
+                # print(orderid)
+                # time.sleep(5)
+                # print(cancleOrder(symbol,str(orderid)))
+        time.sleep(60)
+
+def findSymbol(message):
+    start = message.find("#")
+    stop = message.find(" ")
+    return f'{message[start+1:stop]}-USDT'
+
 with client:
     client.loop.run_until_complete(main())
-
-

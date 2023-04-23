@@ -24,41 +24,49 @@ from utils import SECRET_KEY, API_KEY, APIURL
 
 coins = ['BTC', 'ETH', 'XRP']
 lastOrderId = None
+
+
 def genSignature(path, method, paramsMap):
     sortedKeys = sorted(paramsMap)
     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in sortedKeys])
     paramsStr = method + path + paramsStr
     return hmac.new(SECRET_KEY.encode("utf-8"), paramsStr.encode("utf-8"), digestmod="sha256").digest()
 
+
 def post(url, body):
     req = urllib.request.Request(url, data=body.encode("utf-8"), headers={'User-Agent': 'Mozilla/5.0'})
     return urllib.request.urlopen(req).read()
 
+
 def getBalance():
     paramsMap = {
         "apiKey": API_KEY,
-        "timestamp": int(time.time()*1000),
+        "timestamp": int(time.time() * 1000),
         "currency": "USDT",
     }
     sortedKeys = sorted(paramsMap)
     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in sortedKeys])
-    paramsStr += "&sign=" + urllib.parse.quote(base64.b64encode(genSignature("/api/v1/user/getBalance", "POST", paramsMap)))
+    paramsStr += "&sign=" + urllib.parse.quote(
+        base64.b64encode(genSignature("/api/v1/user/getBalance", "POST", paramsMap)))
     url = "%s/api/v1/user/getBalance" % APIURL
     return post(url, paramsStr)
+
 
 def getPositions(symbol):
     paramsMap = {
         "symbol": symbol,
         "apiKey": API_KEY,
-        "timestamp": int(time.time()*1000),
+        "timestamp": int(time.time() * 1000),
     }
     sortedKeys = sorted(paramsMap)
     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in sortedKeys])
-    paramsStr += "&sign=" + urllib.parse.quote(base64.b64encode(genSignature("/api/v1/user/getPositions", "POST", paramsMap)))
+    paramsStr += "&sign=" + urllib.parse.quote(
+        base64.b64encode(genSignature("/api/v1/user/getPositions", "POST", paramsMap)))
     url = "%s/api/v1/user/getPositions" % APIURL
     return post(url, paramsStr)
 
-def placeOrder(symbol, side, price, volume, tradeType, action):
+
+def placeOrder(symbol, side, price, volume, tradeType, action,tf,sl):
     paramsMap = {
         "symbol": symbol,
         "apiKey": API_KEY,
@@ -67,67 +75,73 @@ def placeOrder(symbol, side, price, volume, tradeType, action):
         "entrustVolume": volume,
         "tradeType": tradeType,
         "action": action,
-        "timestamp": int(time.time()*1000),
+        "timestamp": int(time.time() * 1000),
+        "takerProfitPrice": tf,
+        "stopLossPrice": sl
     }
+
     sortedKeys = sorted(paramsMap)
     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in sortedKeys])
     paramsStr += "&sign=" + urllib.parse.quote(base64.b64encode(genSignature("/api/v1/user/trade", "POST", paramsMap)))
     url = "%s/api/v1/user/trade" % APIURL
     return post(url, paramsStr)
 
-def cancleOrder(symbol,orderId):
+
+def cancleOrder(symbol, orderId):
     paramsMap = {
         "symbol": symbol,
         "apiKey": API_KEY,
         "orderId": orderId,
-        "timestamp": int(time.time()*1000),
+        "timestamp": int(time.time() * 1000),
     }
     sortedKeys = sorted(paramsMap)
     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in sortedKeys])
-    paramsStr += "&sign=" + urllib.parse.quote(base64.b64encode(genSignature("/api/v1/user/trade", "POST", paramsMap)))
-    url = "%s/api/v1/user/trade" % APIURL
+    paramsStr += "&sign=" + urllib.parse.quote(base64.b64encode(genSignature("/api/v1/user/cancelOrder", "POST", paramsMap)))
+    url = "%s/api/v1/user/cancelOrder" % APIURL
     return post(url, paramsStr)
+
 
 def getLatestPrice(symbol):
     paramsMap = {
         "symbol": symbol,
     }
-    paramsStr = "&sign=" + urllib.parse.quote(base64.b64encode(genSignature("/api/v1/market/getLatestPrice", "GET", paramsMap)))
+    paramsStr = "&sign=" + urllib.parse.quote(
+        base64.b64encode(genSignature("/api/v1/market/getLatestPrice", "GET", paramsMap)))
     url = f'https://api-swap-rest.bingbon.pro/api/v1/market/getLatestPrice?&symbol={symbol}{paramsStr}'
     payload = {}
     headers = {
     }
     response = requests.request("GET", url, headers=headers, data=payload)
 
-    return response.text
-
-
+    last_price = (json.loads(response.text))['data']['tradePrice']
+    last_price = float(last_price)
+    return last_price
 
 def main():
-    # print(getLatestPrice("BTC-USDT"))
-    # thr = threading.Thread(target=getLastMessage, args=(), kwargs={})
-    # thr.start()
-    # coro = getLastMessage()
-    # asyncio.run(coro)
-    # loop = asyncio.get_event_loop()
+    print(cancleOrder("ETH-USDT",'1649936112992391168'))
+# print(getLatestPrice("BTC-USDT"))
+# thr = threading.Thread(target=getLastMessage, args=(), kwargs={})
+# thr.start()
+# coro = getLastMessage()
+# asyncio.run(coro)
+# loop = asyncio.get_event_loop()
 
-    # print("getBalance:", getBalance())
-    # while True:
-    #     getLastMessage()
-        # print("getLastPrice :", getLatestPrice("BTC-USDT"))
-        # result = loop.run_until_complete(coro)
-        # time.sleep(3)
+# print("getBalance:", getBalance())
+# while True:
+#     getLastMessage()
+# print("getLastPrice :", getLatestPrice("BTC-USDT"))
+# result = loop.run_until_complete(coro)
+# time.sleep(3)
 
-    # placeOrder("ETH-USDT", "Bid", 0, 0.02, "Market", "Open")
-    # result = placeOrder("ETH-USDT", "Bid", 0, 0.01, "Market", "Open")
-    # my_json = result.decode('utf8').replace("'", '"')
-    # print(my_json[3])
-    # print("placeOpenOrder:", placeOrder("DOGE-USDT", "Bid", 0,2, "Market", "Open"))
+# placeOrder("ETH-USDT", "Bid", 0, 0.02, "Market", "Open")
+# result = placeOrder("ETH-USDT", "Bid", 0, 0.01, "Market", "Open")
+# my_json = result.decode('utf8').replace("'", '"')
+# print(my_json[3])
+# print("placeOpenOrder:", placeOrder("DOGE-USDT", "Bid", 0,2, "Market", "Open"))
 
-    # print("getPositions:", getPositions("BTC-USDT"))
+# print("getPositions:", getPositions("BTC-USDT"))
 
-    # print("placeCloseOrder:", placeOrder("BTC-USDT", "Ask", 0, 0.0004, "Market", "Close"))
+# print("placeCloseOrder:", placeOrder("BTC-USDT", "Ask", 0, 0.0004, "Market", "Close"))
 
 if __name__ == "__main__":
     main()
-

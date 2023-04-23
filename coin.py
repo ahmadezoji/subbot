@@ -56,7 +56,7 @@ def genSignature(path, method, paramsMap):
     paramsStr = method + path + paramsStr
     return hmac.new(SECRET_KEY.encode("utf-8"), paramsStr.encode("utf-8"), digestmod="sha256").digest()
 def loadData():
-    result  = getHistory("BTC-USDT","60",1679154423000,int(time.time() * 1000))
+    result  = getHistory("BTC-USDT","60",1679244507000,int(time.time() * 1000))
     json_object = json.loads(result)
     mlist = list(json_object["data"]["klines"])
     times = []
@@ -108,6 +108,7 @@ def showData(times,prices):
     i = 0
     window_size = 50
     moving_averages = []
+    print(f'length = {len(prices)}')
     while i < len(prices) - window_size + 1:
         # Store elements from i to i+window_size
         # in list to get the current window
