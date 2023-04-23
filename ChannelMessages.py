@@ -1,8 +1,6 @@
 import configparser
 import json
-import asyncio
-from datetime import date, datetime
-import time
+from datetime import datetime
 
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
@@ -13,7 +11,6 @@ from telethon.tl.types import (
 
 # some functions to parse json date
 from trade import *
-from utils import getLatestPrice
 
 
 class DateTimeEncoder(json.JSONEncoder):

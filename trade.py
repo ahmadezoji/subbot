@@ -1,16 +1,7 @@
-import threading
-
-import requests
-import pandas as pd
-import time
-import datetime
 import hmac
-import hashlib
 import time
 import base64
 import urllib
-import json
-import asyncio
 
 ORDER_AMOUNT = 20
 
