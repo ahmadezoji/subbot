@@ -11,9 +11,9 @@ from telethon.tl.types import (
     PeerChannel
 )
 
-
 # some functions to parse json date
 from trade import *
+from utils import getLatestPrice
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -57,7 +57,7 @@ async def main():
 
     me = await client.get_me()
 
-    user_input_channel = 'https://t.me/rosecryptochannelpremium'  # 'https://t.me/iraninanfreedom'#'https://t.me/withIranfromIstanbul'#'https://t.me/IranintlTV' #https://t.me/ManotoTV'
+    user_input_channel = 'https://t.me/iraninanfreedom' #'https://t.me/rosecryptochannelpremium'   #'https://t.me/withIranfromIstanbul'#'https://t.me/IranintlTV' #https://t.me/ManotoTV'
     # input('enter entity(telegram URL or entity id):')
 
     if user_input_channel.isdigit():
@@ -68,64 +68,60 @@ async def main():
     my_channel = await client.get_entity(entity)
 
     offset_id = 0
-    limit = 25
+    limit = 5
     all_messages = []
     submit_orders_id = []
     total_messages = 0
     total_count_limit = 0
+    try:
+        while True:
+            history = await client(GetHistoryRequest(
+                peer=my_channel,
+                offset_id=0,
+                offset_date=None,
+                add_offset=0,
+                limit=limit,
+                max_id=0,
+                min_id=offset_id,
+                hash=0
+            ))
+            messages = history.messages
+            if len(messages) > 0:
+                try:
+                    for msg in messages:
+                        if msg.message == "" or msg.message is None:
+                            continue
+                        if "buy setup" in str(msg.message).lower():
+                            type = "long"
+                            symbol = findSymbol(msg.message)
+                            print(f'long symbol ={symbol}\n')
+                            setLeverage(symbol,"Long",10)
+                            setupOrder(type, symbol)
+                        elif "short setup" in str(msg.message).lower():
+                            type = "short"
+                            symbol = findSymbol(msg.message)
+                            print(f'short symbol= {symbol}\n')
+                            setLeverage(symbol, "Short", 10)
+                            setupOrder(type, symbol)
+                    offset_id = messages[0].id
+                except Exception:
+                    print("mored too loop!!")
 
-    while True:
-        history = await client(GetHistoryRequest(
-            peer=my_channel,
-            offset_id=0,
-            offset_date=None,
-            add_offset=0,
-            limit=limit,
-            max_id=0,
-            min_id=0,
-            hash=0
-        ))
-        messages = history.messages
-        if len(messages) > 0:
-            type = "long"
+                    # my_json = json.loads(result.decode('utf8').replace("'", '"'))
+                    # orderid = my_json['data']['orderId']
+                    # print(orderid)
+                    # time.sleep(5)
+                    # print(cancleOrder(symbol,str(orderid)))
+            time.sleep(10)
+    except Exception:
+        print("AKH In Che Errori Bood !!!")
 
-            for msg in messages:
-                symbol = " "
-                if "buy setup" in msg.message.lower():
-                    type = "long"
-                    symbol = findSymbol(msg.message)
-                    print(f'long symbol ={symbol}\n')
-                elif "short setup" in msg.message.lower():
-                    type = "short"
-                    symbol = findSymbol(msg.message)
-                    print(f'short symbol= {symbol}\n')
-                offset_id = messages[0].id
-
-                amount = 10.0 #USDT
-                last_price = getLatestPrice(symbol)
-                # vol = amount /  last_price
-                # if type == "short" :
-                #     takerProfitPrice = last_price - (last_price * 0.02)
-                #     stopLossPrice = last_price + (last_price * 0.05)
-                #     result = placeOrder(symbol, "Ask", last_price , vol, "Market", "Open",takerProfitPrice,stopLossPrice)
-                # else:
-                #     takerProfitPrice = last_price + (last_price * 0.05)
-                #     stopLossPrice = last_price - (last_price * 0.02)
-                #     result = placeOrder(symbol, "Bid", last_price, vol, "Market", "Open", takerProfitPrice, stopLossPrice)
-                # print(result)
-
-
-                # my_json = json.loads(result.decode('utf8').replace("'", '"'))
-                # orderid = my_json['data']['orderId']
-                # print(orderid)
-                # time.sleep(5)
-                # print(cancleOrder(symbol,str(orderid)))
-        time.sleep(60)
 
 def findSymbol(message):
     start = message.find("#")
     stop = message.find(" ")
-    return f'{message[start+1:stop]}-USDT'
+    return f'{str(message[start + 1:stop]).upper()}-USDT'
+
 
 with client:
     client.loop.run_until_complete(main())

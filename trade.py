@@ -11,16 +11,11 @@ import base64
 import urllib
 import json
 import asyncio
-# import numpy as np
-# Replace YOUR_API_KEY with your actual API key
-# from ChannelMessages import getLastMessage
 
-# APIURL = "https://api-swap-rest.bingbon.pro"
-# API_KEY = 'v29D1wyTsUbNLfinjqqgorjRV5nMyPJgrWye80AxnhiAQrP4wAo3RmU34otFehnHJcjOoZCLkJzLcNB5ZKyyQ'
-# SECRET_KEY = '96ou8MIZzN9mXgZVEjFxMLwWM4iDrivKJ4eDx3gYyZ4LR5F0yzrkvbUdgzpiX1p8EbVyC8qgHfC1Zyzqg'
+ORDER_AMOUNT = 20
 
 # Define a list of your favorite cryptocurrencies
-from utils import SECRET_KEY, API_KEY, APIURL
+from utils import SECRET_KEY, API_KEY, APIURL, getLatestPrice
 
 coins = ['BTC', 'ETH', 'XRP']
 lastOrderId = None
@@ -65,7 +60,19 @@ def getPositions(symbol):
     url = "%s/api/v1/user/getPositions" % APIURL
     return post(url, paramsStr)
 
-
+def setupOrder(type, symbol):
+    amount = float(ORDER_AMOUNT)  # USDT
+    last_price = getLatestPrice(symbol)
+    vol = amount / last_price
+    if type == "short":
+        takerProfitPrice = last_price - (last_price * 0.02)
+        stopLossPrice = last_price + (last_price * 0.05)
+        result = placeOrder(symbol, "Ask", last_price, vol, "Market", "Open", takerProfitPrice, stopLossPrice)
+    elif type == "long":
+        takerProfitPrice = last_price + (last_price * 0.05)
+        stopLossPrice = last_price - (last_price * 0.02)
+        result = placeOrder(symbol, "Bid", last_price, vol, "Market", "Open", takerProfitPrice, stopLossPrice)
+    print(result)
 def placeOrder(symbol, side, price, volume, tradeType, action,tf,sl):
     paramsMap = {
         "symbol": symbol,
@@ -100,25 +107,24 @@ def cancleOrder(symbol, orderId):
     url = "%s/api/v1/user/cancelOrder" % APIURL
     return post(url, paramsStr)
 
-
-def getLatestPrice(symbol):
+def setLeverage(symbol,side,leverage):
     paramsMap = {
         "symbol": symbol,
+        "apiKey": API_KEY,
+        "side": side,
+        "leverage" : leverage,
+        "timestamp": int(time.time() * 1000),
     }
-    paramsStr = "&sign=" + urllib.parse.quote(
-        base64.b64encode(genSignature("/api/v1/market/getLatestPrice", "GET", paramsMap)))
-    url = f'https://api-swap-rest.bingbon.pro/api/v1/market/getLatestPrice?&symbol={symbol}{paramsStr}'
-    payload = {}
-    headers = {
-    }
-    response = requests.request("GET", url, headers=headers, data=payload)
+    sortedKeys = sorted(paramsMap)
+    paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in sortedKeys])
+    paramsStr += "&sign=" + urllib.parse.quote(
+        base64.b64encode(genSignature("/api/v1/user/setLeverage", "POST", paramsMap)))
+    url = "%s/api/v1/user/setLeverage" % APIURL
+    return post(url, paramsStr)
 
-    last_price = (json.loads(response.text))['data']['tradePrice']
-    last_price = float(last_price)
-    return last_price
-
-def main():
-    print(cancleOrder("ETH-USDT",'1649936112992391168'))
+# def main():
+#     getLatestPrice("BTC-USDT")
+    # print(cancleOrder("ETH-USDT",'1649936112992391168'))
 # print(getLatestPrice("BTC-USDT"))
 # thr = threading.Thread(target=getLastMessage, args=(), kwargs={})
 # thr.start()
@@ -143,5 +149,5 @@ def main():
 
 # print("placeCloseOrder:", placeOrder("BTC-USDT", "Ask", 0, 0.0004, "Market", "Close"))
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
