@@ -56,14 +56,15 @@ def setupOrder(type, symbol):
     last_price = getLatestPrice(symbol)
     vol = amount / last_price
     if type == "short":
-        takerProfitPrice = last_price - (last_price * 0.02)
-        stopLossPrice = last_price + (last_price * 0.05)
+        takerProfitPrice = float(last_price - (last_price * 0.02))
+        stopLossPrice = float(last_price + (last_price * 0.05))
         result = placeOrder(symbol, "Ask", last_price, vol, "Market", "Open", takerProfitPrice, stopLossPrice)
+        print(result)
     elif type == "long":
-        takerProfitPrice = last_price + (last_price * 0.05)
-        stopLossPrice = last_price - (last_price * 0.02)
+        takerProfitPrice = float(last_price + (last_price * 0.05))
+        stopLossPrice = float(last_price - (last_price * 0.02))
         result = placeOrder(symbol, "Bid", last_price, vol, "Market", "Open", takerProfitPrice, stopLossPrice)
-    print(result)
+        print(result)
 def placeOrder(symbol, side, price, volume, tradeType, action,tf,sl):
     print(f'TF ={tf}')
     print(f'SL ={sl}')
