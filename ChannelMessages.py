@@ -54,7 +54,7 @@ async def main():
 
     me = await client.get_me()
 
-    user_input_channel = 'https://t.me/rosecryptochannelpremium' #'https://t.me/iraninanfreedom' #'https://t.me/rosecryptochannelpremium'   #'https://t.me/withIranfromIstanbul'#'https://t.me/IranintlTV' #https://t.me/ManotoTV'
+    user_input_channel = 'https://t.me/iraninanfreedom'#'https://t.me/rosecryptochannelpremium' #'https://t.me/rosecryptochannelpremium'   #'https://t.me/withIranfromIstanbul'#'https://t.me/IranintlTV' #https://t.me/ManotoTV'
     # input('enter entity(telegram URL or entity id):')
 
     if user_input_channel.isdigit():
