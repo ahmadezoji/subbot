@@ -100,7 +100,19 @@ def cancleOrder(symbol, orderId):
     paramsStr += "&sign=" + urllib.parse.quote(base64.b64encode(genSignature("/api/v1/user/cancelOrder", "POST", paramsMap)))
     url = "%s/api/v1/user/cancelOrder" % APIURL
     return post(url, paramsStr)
-
+def setMarginMode(symbol,marginMode):
+    paramsMap = {
+        "symbol": symbol,
+        "apiKey": API_KEY,
+        "marginMode": marginMode,
+        "timestamp": int(time.time() * 1000),
+    }
+    sortedKeys = sorted(paramsMap)
+    paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in sortedKeys])
+    paramsStr += "&sign=" + urllib.parse.quote(
+        base64.b64encode(genSignature("/api/v1/user/setMarginMode", "POST", paramsMap)))
+    url = "%s/api/v1/user/setMarginMode" % APIURL
+    return post(url, paramsStr)
 def setLeverage(symbol,side,leverage):
     paramsMap = {
         "symbol": symbol,

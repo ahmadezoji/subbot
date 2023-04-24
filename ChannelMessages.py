@@ -92,12 +92,14 @@ async def main():
                             type = "long"
                             symbol = findSymbol(msg.message)
                             print(f'long symbol ={symbol}\n')
+                            setMarginMode(symbol,"Isolated")
                             setLeverage(symbol,"Long",10)
                             setupOrder(type, symbol)
                         elif "short setup" in str(msg.message).lower():
                             type = "short"
                             symbol = findSymbol(msg.message)
                             print(f'short symbol= {symbol}\n')
+                            setMarginMode(symbol, "Isolated")
                             setLeverage(symbol, "Short", 10)
                             setupOrder(type, symbol)
                     offset_id = messages[0].id
