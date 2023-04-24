@@ -3,7 +3,7 @@ import time
 import base64
 import urllib
 
-ORDER_AMOUNT = 20
+ORDER_AMOUNT = 70
 
 # Define a list of your favorite cryptocurrencies
 from utils import SECRET_KEY, API_KEY, APIURL, getLatestPrice
