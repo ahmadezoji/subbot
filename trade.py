@@ -4,6 +4,8 @@ import base64
 import urllib
 
 ORDER_AMOUNT = 70
+LONG_LEVERAGE = 10
+SHORT_LEVERAGE = 10
 
 # Define a list of your favorite cryptocurrencies
 from utils import SECRET_KEY, API_KEY, APIURL, getLatestPrice
@@ -51,8 +53,8 @@ def getPositions(symbol):
     url = "%s/api/v1/user/getPositions" % APIURL
     return post(url, paramsStr)
 
-def setupOrder(type, symbol):
-    amount = float(ORDER_AMOUNT)  # USDT
+def setupOrder(type, symbol,leverage,amount):
+    amount = float(amount*leverage)  # USDT
     last_price = getLatestPrice(symbol)
     vol = amount / last_price
     if type == "short":

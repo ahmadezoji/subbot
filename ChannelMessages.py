@@ -93,15 +93,15 @@ async def main():
                             symbol = findSymbol(msg.message)
                             print(f'long symbol ={symbol}\n')
                             setMarginMode(symbol,"Isolated")
-                            setLeverage(symbol,"Long",10)
-                            setupOrder(type, symbol)
+                            setLeverage(symbol,"Long",LONG_LEVERAGE)
+                            setupOrder(type, symbol,LONG_LEVERAGE,ORDER_AMOUNT)
                         elif "short setup" in str(msg.message).lower():
                             type = "short"
                             symbol = findSymbol(msg.message)
                             print(f'short symbol= {symbol}\n')
                             setMarginMode(symbol, "Isolated")
-                            setLeverage(symbol, "Short", 10)
-                            setupOrder(type, symbol)
+                            setLeverage(symbol, "Short", SHORT_LEVERAGE)
+                            setupOrder(type, symbol,SHORT_LEVERAGE,ORDER_AMOUNT)
                     offset_id = messages[0].id
                 except Exception:
                     print("mored too loop!!")
