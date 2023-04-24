@@ -109,7 +109,7 @@ async def main():
                     # print(orderid)
                     # time.sleep(5)
                     # print(cancleOrder(symbol,str(orderid)))
-            time.sleep(10)
+            time.sleep(60)
     except Exception:
         print("AKH In Che Errori Bood !!!")
 
