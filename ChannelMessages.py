@@ -66,7 +66,7 @@ async def main():
     my_channel = await client.get_entity(entity)
 
     offset_id = 0
-    limit = 5
+    limit = 10
     all_messages = []
     submit_orders_id = []
     total_messages = 0
