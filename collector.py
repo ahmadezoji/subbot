@@ -3,8 +3,9 @@ import os
 import openai
 
 def openAI():
-    openai.organization = "org-CLFZ9je7cd5PzOefNeu46i1q"
-    openai.api_key = os.getenv("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")
+    openai.organization = "org-uqsqlxa17ztpCIFa970dSw92"
+    # openai.api_key = os.getenv("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")
+    openai.api_key = "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"
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[

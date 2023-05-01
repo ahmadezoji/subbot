@@ -72,6 +72,23 @@ def loadData():
         with open('crypto_data.csv', 'a', encoding='UTF8') as f:
             writer = csv.writer(f)
             writer.writerow(data)
+def loadData():
+    result  = getHistory("BTC-USDT","60",1679244507000,int(time.time() * 1000))
+    json_object = json.loads(result)
+    mlist = list(json_object["data"]["klines"])
+    times = []
+    prices = []
+    header = ['close', 'volume','ma_50', 'rsi_14', 'direction']
+    with open('crypto_data.csv', 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+    for item in mlist:
+        data = [item["close"], item["volume"],0,0,0]
+        times.append(item["time"])
+        prices.append(item["close"])
+        with open('crypto_data.csv', 'a', encoding='UTF8') as f:
+            writer = csv.writer(f)
+            writer.writerow(data)
 
     showData(times,prices)
 def arrangeData():

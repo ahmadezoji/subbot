@@ -4,7 +4,8 @@ from datetime import datetime
 
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
-from telethon.tl.functions.messages import (GetHistoryRequest, GetUnreadMentionsRequest)
+from telethon.tl.functions.messages import (GetHistoryRequest, GetUnreadMentionsRequest, GetMessageEditDataRequest,
+                                            GetMessagesRequest)
 from telethon.tl.types import (
     PeerChannel
 )
@@ -70,6 +71,7 @@ async def main():
     submit_orders_id = []
     total_messages = 0
     total_count_limit = 0
+
     try:
         while True:
             history = await client(GetHistoryRequest(
@@ -88,6 +90,12 @@ async def main():
                     for msg in messages:
                         if msg.message == "" or msg.message is None:
                             continue
+                        if msg.reply_to is not None:
+                            print(msg.id,msg.reply_to.MessageReplyHeader.args)
+                            # result = await client(GetMessagesRequest(id=[message_id]))
+                            # message = result.messages[0]
+                            # print(message.text)
+                        # print(msg)
                         if "buy setup" in str(msg.message).lower():
                             type = "long"
                             symbol = findSymbol(msg.message)
